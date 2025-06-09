@@ -31,7 +31,7 @@ void solveExplicit(int N, double dt, double dx, double Neu, double Diri,
 
   HDF5::Writer  writer("Solution_Explicit.h5");
 
-  for (int it = 0; it < Nsteps; ++it) {
+  for (int it = 0; it < 5000; ++it) {
     for (int jj = 1; jj < N; ++jj) {
       u[jj] = u_old[jj] + CFL * (u_old[jj-1] - 2*u_old[jj] + u_old[jj+1]) + dt*g_x;
 //------------------------------------
