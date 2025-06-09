@@ -69,6 +69,7 @@ int main(int argc, char **argv)
   std::vector<double> u_A(N+1, 1.0);
 
 
+
 //------------------------------------------
 // Boundary Condition
 //*
@@ -89,9 +90,9 @@ int main(int argc, char **argv)
 //------------------------------------------
 // Numerical solution Explicit Euler Scheme
 //*
+  solveAnalytical(N, dx, u_A);
   solveExplicit(N, dt, dx, Neu, Diri, Nsteps, CFL, g_x, u_E, restart, start_step);
   solveImplicit(N, dt, dx, Neu, Diri, Nsteps, CFL, g_x, u_I, restart, start_step);
-  solveAnalytical(N, dx, u_A);
 
 
 //------------------------------------------
