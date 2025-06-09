@@ -82,7 +82,7 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
 
   HDF5::Writer writer("Solution_Implicit.h5");
 
-  for (int step = 0; step < Nsteps; ++step) {
+  for (int step = 0; step < 5000; ++step) {
     VecCopy(u, b);
     VecShift(b, g_x*dt);
 
