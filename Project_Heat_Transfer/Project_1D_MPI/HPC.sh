@@ -19,11 +19,9 @@ if [ "$1" == "fixed_dt" ]; then
 
 elif [ "$1" == "fixed_dx" ]; then
     rm -f error_dt.dat
-#    for CFL in 0.5 0.32 0.16 0.08 0.04; do
-    for CFL in 0.5; do
+    for CFL in 0.5 0.32 0.16 0.08 0.04; do
         echo "Running with CFL = $CFL"
-#        ./build/HeatTransfer1D 1 $CFL fixed_dt >> run_CFL${CFL}.log 2>&1
-        ./build/HeatTransfer1D 16 $CFL fixed_dt >> run_CFL${CFL}.log 2>&1
+        ./build/HeatTransfer1D 1e-3 $CFL fixed_dt >> run_CFL${CFL}.log 2>&1
     done
     echo "Done. Data saved to error_dt.dat"
 
