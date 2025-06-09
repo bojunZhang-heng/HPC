@@ -19,13 +19,13 @@ module load hdf5/1.10.4-intel-18.4
 
 module list
 
-bash HPC.sh fixed_dx
+bash HPC.sh fixed_dt
 
 module purge
 module load gnuplot/5.2.6
 
 cd ./postprocess
-gnuplot plot_error_dt.gp
+gnuplot plot_error_dx.gp
 
 echo "Job finished on $(date)"
 
