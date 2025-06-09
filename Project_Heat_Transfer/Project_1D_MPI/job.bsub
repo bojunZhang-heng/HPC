@@ -1,8 +1,8 @@
 #!/bin/bash
 #BSUB -J heat_transfer        # Job name
 #BSUB -q debug                # Queue name (use "debug" or "short" if just testing)
-#BSUB -n 16                   # Number of cores
-#BSUB -R "span[ptile=16]"      # Cores per node
+#BSUB -n 32                   # Number of cores
+#BSUB -R "span[ptile=32]"     # Cores per node
 #BSUB -o output.%J.log        # Standard output (%J is job ID)
 #BSUB -e error.%J.log         # Standard error
 #BSUB -W 00:10                # Walltime (hh:mm)
@@ -16,6 +16,8 @@ module load cmake/3.21.1
 module load mpi/intel/2018.4
 module load intel/2018.4
 module load hdf5/1.10.4-intel-18.4
+
+module list
 
 bash HPC.sh fixed_dx
 
