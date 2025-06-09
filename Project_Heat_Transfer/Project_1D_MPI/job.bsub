@@ -21,5 +21,11 @@ module list
 
 bash HPC.sh fixed_dx
 
+module purge
+module load gnuplot/5.2.6
+
+cd ./postprocess
+gnuplot plot_error_dt.gp
+
 echo "Job finished on $(date)"
 
