@@ -30,12 +30,13 @@ int main(int argc, char **argv)
 //*
    int    N     = 16; 
    double CFL   = 0.32;
+   double aL    = 1.0;
 
    std::string mode = "fixed_dx";
 
    if (argc >= 3) {
      if (std::string(argv[3]) == "fixed_dx") {
-       N   = std::stoi(argv[1]);
+       aL  = std::stod(argv[1]);
        CFL = std::stod(argv[2]);
      }
      else if (std::string(argv[3]) == "fixed_dt") {
@@ -45,7 +46,6 @@ int main(int argc, char **argv)
      mode = argv[3];
    }
 
-   double  aL  = 1.0;
    double  dx  = aL / N;
    double  g_x = 2.0 * u0 * nu / (aL * aL);
 
