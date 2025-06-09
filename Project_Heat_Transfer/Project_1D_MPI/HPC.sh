@@ -1,14 +1,6 @@
 #!/bin/bash
 
-module purge
-
-module load cmake/3.21.1
-module load mpi/intel/2018.4
-module load intel/2018.4
-module load hdf5/1.10.4-intel-18.4
-
-module list
-
+rm -rf *.log
 rm -rf build
 mkdir build
 cd build
@@ -21,15 +13,17 @@ if [ "$1" == "fixed_dt" ]; then
     rm -f error_dx.dat
     for N in 8 16 32 64 128; do
         echo "Running with N = $N"
-        ./build/HeatTransfer1D $N fixed_dx >> /dev/null
+        ./build/HeatTransfer1D $N 1e-3 fixed_dx >> run_N${N}.log 2>&1
     done
     echo "Done. Data saved to error_dx.dat"
 
 elif [ "$1" == "fixed_dx" ]; then
     rm -f error_dt.dat
-    for CFL in 0.5 0.32 0.16 0.08 0.04; do
+#    for CFL in 0.5 0.32 0.16 0.08 0.04; do
+    for CFL in 0.5; do
         echo "Running with CFL = $CFL"
-        ./build/HeatTransfer1D 1000000 $CFL fixed_dt >> /dev/null
+#        ./build/HeatTransfer1D 1 $CFL fixed_dt >> run_CFL${CFL}.log 2>&1
+        ./build/HeatTransfer1D 16 $CFL fixed_dt >> run_CFL${CFL}.log 2>&1
     done
     echo "Done. Data saved to error_dt.dat"
 
