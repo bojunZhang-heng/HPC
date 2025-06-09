@@ -16,12 +16,12 @@ double computeMaxError(const std::vector<double>& u_num, const std::vector<doubl
 }
 
 void writeErrorDX(double dx, double error) {
-    std::ofstream fout("error_dx.dat", std::ios::app);
+    std::ofstream fout("../postprocess/error_dt.dat", std::ios::app);
     fout << std::scientific << std::setprecision(8) << dx << " " << error << "\n";
 }
 
 void writeErrorDT(double dt, double error) {
-    std::ofstream fout("error_dt.dat", std::ios::app);
+    std::ofstream fout("../postprocess/error_dt.dat", std::ios::app);
     fout << std::scientific << std::setprecision(8) << dt << " " << error << "\n";
 }
 
