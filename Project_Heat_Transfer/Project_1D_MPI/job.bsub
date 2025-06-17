@@ -26,6 +26,8 @@ module load gnuplot/5.2.6
 
 cd ./postprocess
 gnuplot plot_error_dx.gp
+gnuplot plot_u_WRT_x_at_T.gp
+gnuplot plot_dudx_WRT_XandT.gp
 
 echo "Job finished on $(date)"
 
