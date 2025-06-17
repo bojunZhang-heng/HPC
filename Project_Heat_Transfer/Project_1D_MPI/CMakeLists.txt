@@ -42,6 +42,8 @@ SET(SRC_FILES
     src/HDF5_Writer.cpp
     src/HDF5_Reader.cpp
     src/ErrorEstimator.cpp
+    src/is_equal.cpp
+    src/write_txt.cpp
 )
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
