@@ -1,10 +1,14 @@
 #include "Explicit.hpp"
 #include "HDF5_Writer.hpp"
 #include "HDF5_Reader.hpp"
+#include "is_equal.hpp"
+#include "write_txt.hpp"
 #include <H5Cpp.h>
 #include <string>
+#include <cmath>
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 void solveExplicit(int N, double dt, double dx, double Neu, double Diri,
                    int Nsteps, double CFL, double g_x,
@@ -13,6 +17,8 @@ void solveExplicit(int N, double dt, double dx, double Neu, double Diri,
                    int restart_step) 
 {
   std::vector<double> u(N+1, 1.0), u_old(N+1, 1.0);
+  std::vector<double> dudx(N+1, 1.0);
+  std::string Output_Dir = "./postprocess/";
   int start_step = 0;
 
   if (restartMode) {
@@ -31,7 +37,15 @@ void solveExplicit(int N, double dt, double dx, double Neu, double Diri,
 
   HDF5::Writer  writer("Solution_Explicit.h5");
 
-  for (int it = 0; it < 5000; ++it) {
+  double tt = 0.0;
+  double t_dimensionless = 0.0;
+
+  std::ofstream fout_dudx("./postprocess/dudx_t.txt");
+
+  for (int it = 0; it < 100000; ++it) {
+    tt = it * dt;
+    t_dimensionless = tt;
+//    std::cout << "tt == "  << tt << '\n';
     for (int jj = 1; jj < N; ++jj) {
       u[jj] = u_old[jj] + CFL * (u_old[jj-1] - 2*u_old[jj] + u_old[jj+1]) + dt*g_x;
 //------------------------------------
@@ -48,6 +62,46 @@ void solveExplicit(int N, double dt, double dx, double Neu, double Diri,
       writer.write_snapshot(u, it);
     }
 
+//------------------------------------
+// Output u at different time
+//*
+    if (is_equal(t_dimensionless, 0.0)){
+      std::cout << "call tt = 0" << "\n";
+      write_txt(u, dx, "./postprocess/outputT=000.txt");
+
+    } 
+    else if (is_equal(t_dimensionless, 0.25*5.0)) {
+      std::cout << "call tt = 0.25T" << "\n";
+      write_txt(u, dx, "./postprocess/outputT=025.txt");
+    } 
+    else if (is_equal(t_dimensionless, 0.5*5.0)) {
+      write_txt(u, dx, "./postprocess/outputT=050.txt");
+    }
+    else if (is_equal(t_dimensionless, 0.75*5.0)) {
+      write_txt(u, dx, "./postprocess/outputT=075.txt");
+    }
+    else if (is_equal(t_dimensionless, 1*5.0)) {
+      write_txt(u, dx, "./postprocess/outputT=100.txt");
+    }
+
+//------------------------------------
+// Find the dudx and record at every time step 
+//*
+    for (int ii = 1; ii<=N; ++ii) {
+      dudx[ii] = (u[ii+1] - u[ii-1]) / (2*dx);
+    }
+ 
+    for (int ii = 0; ii<=N; ++ii) {
+      fout_dudx << dudx[ii] << ' ';
+    }
+
+    fout_dudx << '\n';
   }
+  fout_dudx.close();
   u_out = u;
 }
+
+
+
+
+
