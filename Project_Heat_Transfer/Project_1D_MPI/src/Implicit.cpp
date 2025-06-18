@@ -21,7 +21,7 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
   MPI_Comm_size(comm, &size);
 
 
-  PetscInt size = N-1; 
+  PetscInt global_size = N-1; 
   Vec u, b;
   Mat A;
   KSP ksp;
@@ -106,8 +106,10 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
   }
 
   // === Set Vec u ===
-  for (int ii = 1; ii < N; ++ii) {
-    VecSetValue(u, ii - 1, u_std[ii], INSERT_VALUES);
+  
+  VecGetOwnershipRange(u, &Istart, &Iend);
+  for (int ii = Istart; ii < Iend ++ii) {
+    VecSetValue(u, ii, u_std[ii+1], INSERT_VALUES);
   }
 
   VecAssemblyBegin(u);
