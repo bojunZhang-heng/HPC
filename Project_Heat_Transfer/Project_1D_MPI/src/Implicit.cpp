@@ -115,7 +115,7 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
 
   HDF5::Writer writer("Solution_Implicit.h5");
 
-  for (int step = 0; step < 5000; ++step) {
+  for (int step = start_step; step < 5000; ++step) {
     VecCopy(u, b);
     VecShift(b, g_x*dt);
 
@@ -137,15 +137,28 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
     for (int ii=1; ii<N; ++ii){
       u_std[ii] = u_array[ii-1];
     }
+
+    VecRestoreArrayRead(u, &u_array);
+
     u_std[0] = Diri;
     u_std[N] = u_std[N-1] + Neu*dx;
 
-    VecRestoreArrayRead(u, &u_array);
 
     if (step % 10 == 0) {
       writer.write_snapshot(u_std, step);
     }
+  }
 
+  PetscTime(&t_solve_end);
+
+  
+  if (rank == 0) {
+    double asm_time = t_asm_end - t_start;
+    double solve_time = t_solve_end - t_asm_end;
+    double total_time = t_solve_end - t_start;
+    std::cout << "[Timer] Assembly: " << asm_time << "s\n";
+    std::cout << "[Timer] Solve:    " << solve_time << "s\n";
+    std::cout << "[Timer] Total:    " << total_time << "s\n";
   }
 
   u_out = u_std;
