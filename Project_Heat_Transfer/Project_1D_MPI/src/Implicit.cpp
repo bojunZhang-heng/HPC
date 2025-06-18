@@ -108,7 +108,7 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
   // === Set Vec u ===
   
   VecGetOwnershipRange(u, &Istart, &Iend);
-  for (int ii = Istart; ii < Iend ++ii) {
+  for (int ii = Istart; ii < Iend; ++ii) {
     VecSetValue(u, ii, u_std[ii+1], INSERT_VALUES);
   }
 
@@ -136,8 +136,8 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
     const PetscScalar *u_array;
     VecGetArrayRead(u, &u_array);
 
-    for (int ii=1; ii<N; ++ii){
-      u_std[ii] = u_array[ii-1];
+    for (PetscInt ii=Istart; ii<Iend ++ii){
+      u_std[ii+1] = u_array[ii - Istart];
     }
 
     VecRestoreArrayRead(u, &u_array);
