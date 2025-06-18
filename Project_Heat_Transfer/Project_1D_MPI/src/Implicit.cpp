@@ -29,15 +29,17 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
   PetscScalar diag = 1.0 + 2.0 * CFL;
   PetscScalar offd = -CFL;
 
-  VecCreate(PETSC_COMM_WORLD, &u);
-  VecSetSizes(u, PETSC_DECIDE, size);
+// Create Vectors
+  VecCreate(comm, &u);
+  VecSetSizes(u, PETSC_DECIDE, global_size);
   VecSetFromOptions(u);
   VecDuplicate(u, &b);
 
-  MatCreate(PETSC_COMM_WORLD, &A);
-  MatSetSizes(A, PETSC_DECIDE, PETSC_DECIDE, size, size);
-  MatSetFromOptions(A);
-  MatSetUp(A);
+// Create matrix 
+  MatCreateAIJ(comm, PETSC_DECIDE, PETSC_COMM_WORLD,
+               global_size, global_size, 
+               3, NULL, 1, NULL, &A);
+// Determine ownership raneg
 
   for (int ii = 0; ii<size; ++ii) {
     if (ii > 0) {
