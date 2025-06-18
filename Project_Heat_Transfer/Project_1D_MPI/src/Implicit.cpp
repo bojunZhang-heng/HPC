@@ -6,6 +6,7 @@
 #include <vector>
 #include <petscksp.h>
 #include <iostream>
+#include <mpi.h>
 
 void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
                    int Nsteps, double CFL, double g_x,
@@ -13,6 +14,13 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
                    bool restartMode,
                    int restart_step)
 {
+  MPI_Comm comm = PETSC_COMM_WORLD;
+
+  int rank, size;
+  MPI_Comm_rank(comm, &rank);
+  MPI_Comm_size(comm, &size);
+
+
   PetscInt size = N-1; 
   Vec u, b;
   Mat A;
