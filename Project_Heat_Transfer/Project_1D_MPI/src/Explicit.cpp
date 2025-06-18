@@ -17,7 +17,7 @@ void solveExplicit(int N, double dt, double dx, double Neu, double Diri,
                    int restart_step) 
 {
   std::vector<double> u(N+1, 1.0), u_old(N+1, 1.0);
-  std::vector<double> dudx(N+1, 1.0);
+  std::vector<double> dudx(N+2, 1.0);
   std::string Output_Dir = "./postprocess/";
   int start_step = 0;
 
@@ -87,15 +87,14 @@ void solveExplicit(int N, double dt, double dx, double Neu, double Diri,
 //------------------------------------
 // Find the dudx and record at every time step 
 //*
-    for (int ii = 1; ii<=N; ++ii) {
+    for (int ii = 1; ii<=N-1; ++ii) {
       dudx[ii] = (u[ii+1] - u[ii-1]) / (2*dx);
     }
  
-    for (int ii = 0; ii<=N; ++ii) {
-      fout_dudx << dudx[ii] << ' ';
+    for (int ii = 1; ii<=N-1; ++ii) {
+      fout_dudx << ii*dx << " " <<  tt  << " " << dudx[ii] << '\n';
     }
 
-    fout_dudx << '\n';
   }
   fout_dudx.close();
   u_out = u;
