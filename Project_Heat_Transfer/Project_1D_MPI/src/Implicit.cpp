@@ -39,49 +39,72 @@ void solveImplicit(int N, double dt, double dx, double Neu, double Diri,
   MatCreateAIJ(comm, PETSC_DECIDE, PETSC_COMM_WORLD,
                global_size, global_size, 
                3, NULL, 1, NULL, &A);
-// Determine ownership raneg
 
-  for (int ii = 0; ii<size; ++ii) {
+// Determine ownership range
+  PetscInt Istart, Iend;
+  MatGetOwnershipRange(A, &Istart, &Iend);
+
+// === Timeing Start ====
+  PetscLogDouble t_start, t_asm_end, t_solve_end;
+  PetscTime(&t_start);
+
+  for (PetscInt ii = Istart; ii<Iend; ++ii) {
     if (ii > 0) {
       MatSetValue(A, ii, ii - 1, offd, INSERT_VALUES);
     }
 
     MatSetValue(A, ii, ii, diag, INSERT_VALUES);
     
-    if (ii < size-1) {
+    if (ii < global_size-1) {
       MatSetValue(A, ii, ii+1, offd, INSERT_VALUES);
     }     
   }
-  PetscScalar neu_val = diag + offd;
-  MatSetValue(A, size-1, size-1, neu_val, INSERT_VALUES);
+
+// Neumann BC for last point
+  if (Iend == global_size) {
+    PetscScalar neu_val = diag + offd;
+    MatSetValue(A, global_size-1, global_size-1, neu_val, INSERT_VALUES);
+  }
 
   MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
+  PetscTime(&t_asm_end);
 
-  KSPCreate(PETSC_COMM_WORLD, &ksp);
+  KSPCreate(comm, &ksp);
   KSPSetOperators(ksp, A, A);
   KSPSetFromOptions(ksp);
 
   VecSet(u, 1.0 + g_x*dt);
+
+// Dirichlet BC 
   PetscInt    Diri_indices[1] = {0};
   PetscScalar Diri_contrib[1] = {-offd * Diri};
 
-  PetscInt    Neu_indices[1] = {size-1};
+// Neumann BC 
+  PetscInt    Neu_indices[1] = {global_size-1};
   PetscScalar Neu_contrib[1] = {-offd * Neu * dx};
 
   std::vector<double> u_std(N+1, 1.0 + g_x*dt);
   int start_step = 0;
+
   if (restartMode) {
     try {
       HDF5::Reader reader("Solution_Implicit.h5");
       reader.read_snapshot(u_std, restart_step);
-      std::cout << "[Implicit] Restart from step " << restart_step << '\n';
+
+      if (rank == 0) {
+        std::cout << "[Implicit] Restart from step " << restart_step << '\n';
+      }
+
       start_step = restart_step + 1;
     } catch (const std::exception& e) {
-      std::cerr << "[Implicit] Failed to read snapshot: " << e.what() << '\n';
+      if (rank == 0) {
+        std::cerr << "[Implicit] Failed to read snapshot: " << e.what() << '\n';
+      }
       return;
     }
   }
+
   // === Set Vec u ===
   for (int ii = 1; ii < N; ++ii) {
     VecSetValue(u, ii - 1, u_std[ii], INSERT_VALUES);
